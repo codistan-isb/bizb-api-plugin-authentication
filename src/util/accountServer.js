@@ -3,9 +3,10 @@ import { Mongo } from "@accounts/mongo";
 import { AccountsServer } from "@accounts/server";
 import { AccountsPassword } from "@accounts/password";
 import mongoose from "mongoose";
-import { AccountsModule } from "@accounts/graphql-api";
 import config from "../config.js";
+import pkg from '@accounts/graphql-api';
 
+const { AccountsModule } = pkg;
 let accountsServer;
 let accountsGraphQL;
 
