@@ -9,9 +9,8 @@ import getAccounts from "./util/accountServer.js";
  */
 export default async function register(app) {
   const { accountsGraphQL } = await getAccounts(app);
-
   await app.registerPlugin({
-    label: "Authentication",
+    label: "Authentication-LoS",
     name: "authentication",
     autoEnable: true,
     version: pkg.version,

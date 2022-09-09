@@ -26,7 +26,18 @@ export default async (app) => {
     idProvider: () => mongoose.Types.ObjectId().toString()
   });
 
-  const password = new AccountsPassword();
+  const password = new AccountsPassword(
+    {
+      validateNewUser: async (user) => {
+        // You can apply some custom validation
+        let userObj={};
+        userObj={...user, username: user.username.replace("tobypassverification", "+")}
+
+        // We specify all the fields that can be inserted in the database
+        return userObj;
+      }
+    }
+  );
 
   accountsServer = new AccountsServer(
     {
