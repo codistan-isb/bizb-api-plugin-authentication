@@ -31,7 +31,7 @@ export default async (app) => {
       validateNewUser: async (user) => {
         // You can apply some custom validation
         let userObj={};
-        userObj={...user, username: user.username.replace("tobypassverification", "+")}
+        userObj={...user, username: user.username.replace("tobypassverification", "")}
 
         // We specify all the fields that can be inserted in the database
         return userObj;
