@@ -1,0 +1,7 @@
+extend input CreateUserInput {
+    username: String = "insecure"
+  legacyUsername:String
+}
+extend type Account {
+  legacyUsername: String
+}

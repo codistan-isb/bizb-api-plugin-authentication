@@ -16,10 +16,8 @@ export default async (app) => {
   }
   const { MONGO_URL, STORE_URL, TOKEN_SECRET } = config;
   const { context } = app;
-
   const client = await mongoConnectWithRetry(MONGO_URL);
   const db = client.db();
-
   const accountsMongo = new Mongo(db, {
     convertUserIdToMongoObjectId: false,
     convertSessionIdToMongoObjectId: false,
@@ -28,10 +26,26 @@ export default async (app) => {
 
   const password = new AccountsPassword(
     {
+
       validateNewUser: async (user) => {
         // You can apply some custom validation
-        let userObj={};
-        userObj={...user, username: user.username.replace("tobypassverification", "")}
+        const { legacyUsername, username } = user;
+        let userObj = {};
+        if (username === "insecure") {
+          if(!legacyUsername||legacyUsername==""){
+            throw new Error("legacyUsername is required with insecure username mode")
+
+          }
+          const usersCollection = accountsMongo.db.collection('users');
+
+          const UsernameExist = await usersCollection.findOne({
+            "username": legacyUsername
+          });
+          if (UsernameExist) {
+            throw new Error("Username already exists")
+          }
+        }
+        userObj = { ...user, username: username === "insecure" ? user.legacyUsername : user.username }
 
         // We specify all the fields that can be inserted in the database
         return userObj;
