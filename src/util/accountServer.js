@@ -29,9 +29,9 @@ export default async (app) => {
 
       validateNewUser: async (user) => {
         // You can apply some custom validation
-        const { legacyUsername, username } = user;
+        const { legacyUsername, username,email } = user;
         let userObj = {};
-        if (username === "insecure") {
+        if (username === "insecure"&& !email) {
           if(!legacyUsername||legacyUsername==""){
             throw new Error("legacyUsername is required with insecure username mode")
 
