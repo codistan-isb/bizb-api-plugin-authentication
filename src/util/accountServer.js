@@ -31,10 +31,12 @@ export default async (app) => {
         // You can apply some custom validation
         const { legacyUsername, username,email } = user;
         let userObj = {};
+        if(!email||email=="") {
         if (username === "insecure") {
-          if((!email||email=="") && (!legacyUsername||legacyUsername=="")){
+          if(!legacyUsername||legacyUsername==""){
             throw new Error("legacyUsername is required with insecure username mode")
-          }
+          }else{
+            
           const usersCollection = accountsMongo.db.collection('users');
 
           const UsernameExist = await usersCollection.findOne({
@@ -44,6 +46,8 @@ export default async (app) => {
             throw new Error("Username already exists")
           }
         }
+        }
+      }
         userObj = { ...user, username: username === "insecure" ? user.legacyUsername : user.username }
 
         // We specify all the fields that can be inserted in the database
