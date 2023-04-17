@@ -34,7 +34,8 @@ export default async (app) => {
         if (username === "insecure") {
           if((!email||email=="") && (!legacyUsername||legacyUsername=="")){
             throw new Error("legacyUsername is required with insecure username mode")
-          }
+          }else{
+            
           const usersCollection = accountsMongo.db.collection('users');
 
           const UsernameExist = await usersCollection.findOne({
@@ -43,6 +44,7 @@ export default async (app) => {
           if (UsernameExist) {
             throw new Error("Username already exists")
           }
+        }
         }
         userObj = { ...user, username: username === "insecure" ? user.legacyUsername : user.username }
 
