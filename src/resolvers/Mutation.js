@@ -5,7 +5,7 @@ export default {
     createUser: async (_, { user }, ctx) => {
         const { injector, infos, collections } = ctx;
         const { Accounts, users } = collections;
-        console.log("user", user);
+        // console.log("user", user);
         const accountsServer = injector.get(server_1.AccountsServer);
         const accountsPassword = injector.get(password_1.AccountsPassword);
         let userId;
@@ -25,7 +25,7 @@ export default {
             throw error;
         }
 
-        console.log("userId", userId);
+        // console.log("userId", userId);
         if (userId) {
             // console.log("user", user);
             const account = {
@@ -53,7 +53,7 @@ export default {
             };
             const accountAdded = await Accounts.insertOne(account);
 
-            console.log("addedd acount is ", accountAdded);
+            // console.log("addedd acount is ", accountAdded);
         }
         if (!accountsServer.options.enableAutologin) {
             return {
