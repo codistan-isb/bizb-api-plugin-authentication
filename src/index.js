@@ -7,16 +7,19 @@ import importAsString from "@reactioncommerce/api-utils/importAsString.js";
 
 const mySchema = importAsString("./schema.graphql");
 
+import Mutation from "./resolvers/Mutation.js";
+
 /**
  * @summary Registers the authentication plugin
  * @param {ReactionAPI} app The ReactionAPI instance
  * @returns {undefined}
  */
 export default async function register(app) {
-  const { accountsGraphQL,accountsServer } = await getAccounts(app);
+  const { accountsGraphQL, accountsServer } = await getAccounts(app);
 
-  let ResolverObj=accountsGraphQL.resolvers;
-  ResolverObj["Account"]=Account;
+  let ResolverObj = accountsGraphQL.resolvers;
+  ResolverObj["Mutation"] = Mutation
+  ResolverObj["Account"] = Account;
   await app.registerPlugin({
     label: "Authentication-LoS",
     name: "authentication",

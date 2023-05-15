@@ -1,7 +1,13 @@
 extend input CreateUserInput {
-    username: String = "insecure"
-  legacyUsername:String
+  username: String = "insecure"
+  legacyUsername: String
+  firstName: String
+  lastName: String
+  phoneNumber: String
 }
 extend type Account {
   legacyUsername: String
+  firstName: String
+  lastName: String
+  phoneNumber: String
 }

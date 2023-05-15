@@ -1,5 +1,5 @@
 {
-  "name": "@husamaz1994/api-plugin-authentication",
+  "name": "@codistan-isb/bizb-api-plugin-authentication",
   "description": "Authentication plugin for the Reaction API",
   "version": "3.0.3",
   "main": "index.js",
