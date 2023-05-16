@@ -63,12 +63,25 @@ export default {
         // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
         // are not enabled at the same time
         const createdUser = await accountsServer.findUserById(userId);
+        console.log(" createdUser ", createdUser)
         // If we are here - user must be created successfully
         // Explicitly saying this to Typescript compiler
         const loginResult = await accountsServer.loginWithUser(createdUser, infos);
+        console.log(" loginResult ", loginResult)
         return {
             userId,
             loginResult,
         };
     },
+    authenticate: async (_, args, ctx) => {
+        console.log(args)
+        const { serviceName, params } = args;
+        const { injector, infos, collections } = ctx;
+        const { users } = collections;
+        console.log("authenticate");
+        const authenticated = await injector
+            .get(server_1.AccountsServer)
+            .loginWithService(serviceName, params, infos);
+        return authenticated;
+    }
 };
