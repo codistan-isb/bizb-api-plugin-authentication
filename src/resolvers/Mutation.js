@@ -63,11 +63,11 @@ export default {
         // When initializing AccountsServer we check that enableAutologin and ambiguousErrorMessages options
         // are not enabled at the same time
         const createdUser = await accountsServer.findUserById(userId);
-        console.log(" createdUser ", createdUser)
+        console.log("createdUser ", createdUser)
         // If we are here - user must be created successfully
         // Explicitly saying this to Typescript compiler
         const loginResult = await accountsServer.loginWithUser(createdUser, infos);
-        console.log(" loginResult ", loginResult)
+        console.log("loginResult ", loginResult)
         return {
             userId,
             loginResult,
@@ -83,5 +83,47 @@ export default {
             .get(server_1.AccountsServer)
             .loginWithService(serviceName, params, infos);
         return authenticated;
-    }
+    },
+
+    changePassword: async (
+        _,
+        { oldPassword, newPassword },
+        { user, injector }
+    ) => {
+        if (!(user && user.id)) {
+            throw new Error("Unauthorized");
+        }
+        const userId = user.id;
+        let responsePassword = await injector
+            .get(password_1.AccountsPassword)
+            .changePassword(userId, oldPassword, newPassword);
+        console.log("change password response ", responsePassword);
+        return null;
+    },
+
+    resetPassword: async (_, { token, newPassword }, { injector, infos }) => {
+        return injector
+            .get(password_1.AccountsPassword)
+            .resetPassword(token, newPassword, infos);
+    },
+
+    sendResetPasswordEmail: async (_, { email }, { injector }) => {
+        const accountsServer = injector.get(server_1.AccountsServer);
+        const accountsPassword = injector.get(password_1.AccountsPassword);
+        try {
+            await accountsPassword.sendResetPasswordEmail(email);
+        } catch (error) {
+            // If ambiguousErrorMessages is true,
+            // to prevent user enumeration we fail silently in case there is no user attached to this email
+            if (
+                accountsServer.options.ambiguousErrorMessages &&
+                error instanceof server_1.AccountsJsError &&
+                error.code === password_1.SendResetPasswordEmailErrors.UserNotFound
+            ) {
+                return null;
+            }
+            throw error;
+        }
+        return null;
+    },
 };
