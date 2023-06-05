@@ -38,7 +38,7 @@ export default {
                         provides: "default"
                     }
                 ],
-                groups: [],
+                groups: ["y4PTFE8LEFbsnEjkP"],
                 name: null,
                 profile: {
                     firstName: user.firstName,
