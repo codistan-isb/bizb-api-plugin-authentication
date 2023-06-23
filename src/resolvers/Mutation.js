@@ -97,11 +97,18 @@ export default {
     };
   },
   authenticate: async (_, args, ctx) => {
-    console.log(args);
     const { serviceName, params } = args;
     const { injector, infos, collections } = ctx;
     const { users } = collections;
-    console.log("authenticate");
+    const isOldUserFirstLogin = await users.findOne({
+      "firstLogin": true,
+      "emails.0.address": params?.user?.email,
+    });
+
+    if(isOldUserFirstLogin){
+        return {user:{...isOldUserFirstLogin,id:isOldUserFirstLogin._id}};
+      }
+
     const authenticated = await injector
       .get(server_1.AccountsServer)
       .loginWithService(serviceName, params, infos);
