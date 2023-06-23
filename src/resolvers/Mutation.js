@@ -105,13 +105,13 @@ export default {
       "emails.0.address": params?.user?.email,
     });
 
-    if(isOldUserFirstLogin){
-      
-    const accountsServer = injector.get(server_1.AccountsServer);
-    const accountsPassword = injector.get(password_1.AccountsPassword);
+    if (isOldUserFirstLogin) {
+
+      const accountsServer = injector.get(server_1.AccountsServer);
+      const accountsPassword = injector.get(password_1.AccountsPassword);
       await accountsPassword.sendResetPasswordEmail(params?.user?.email);
-      return {user:{...isOldUserFirstLogin,id:isOldUserFirstLogin._id}};
-      }
+      throw new Error("Password update required, Check your regisetered email for reset password instructions");
+    }
 
     const authenticated = await injector
       .get(server_1.AccountsServer)
@@ -131,14 +131,37 @@ export default {
     let responsePassword = await injector
       .get(password_1.AccountsPassword)
       .changePassword(userId, oldPassword, newPassword);
-    console.log("change password response ", responsePassword);
     return null;
   },
 
-  resetPassword: async (_, { token, newPassword }, { injector, infos }) => {
-    return injector
-      .get(password_1.AccountsPassword)
-      .resetPassword(token, newPassword, infos);
+  resetPassword: async (_, { token, newPassword }, { injector, infos, collections }) => {
+    let resetPasswordResponse = null;
+    const { users } = collections;
+
+    try {
+      
+      const TokenUser=await users.findOne({
+        "services.password.reset": {
+          $elemMatch: {
+            token: token
+          },
+          
+        },
+        
+      });
+      resetPasswordResponse = await injector
+        .get(password_1.AccountsPassword)
+        .resetPassword(token, newPassword, infos);
+
+      if(TokenUser&&TokenUser?.firstLogin){
+        await users.updateOne({_id:TokenUser?._id},{$set:{"firstLogin":false}});
+      }
+      return resetPasswordResponse;
+    }
+    catch (err) {
+      console.log(err)
+      return resetPasswordResponse;
+    }
   },
 
   sendResetPasswordEmail: async (_, { email }, { injector }) => {
