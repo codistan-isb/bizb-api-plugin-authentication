@@ -106,7 +106,11 @@ export default {
     });
 
     if(isOldUserFirstLogin){
-        return {user:{...isOldUserFirstLogin,id:isOldUserFirstLogin._id}};
+      
+    const accountsServer = injector.get(server_1.AccountsServer);
+    const accountsPassword = injector.get(password_1.AccountsPassword);
+      await accountsPassword.sendResetPasswordEmail(params?.user?.email);
+      return {user:{...isOldUserFirstLogin,id:isOldUserFirstLogin._id}};
       }
 
     const authenticated = await injector
