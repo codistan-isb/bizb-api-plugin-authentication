@@ -61,7 +61,7 @@ export default {
             provides: "default",
           },
         ],
-        groups: [groupId],
+        // groups: [groupId],
         name: null,
         profile: {
           firstName: user.firstName,
