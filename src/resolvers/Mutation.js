@@ -96,6 +96,14 @@ export default {
       loginResult,
     };
   },
+    refreshTokens: async (_, args, ctx) => {
+    const { accessToken, refreshToken } = args;
+    const { injector, infos } = ctx;
+    const refreshedSession = await injector
+        .get(server_1.AccountsServer)
+        .refreshTokens(accessToken, refreshToken, infos);
+    return refreshedSession;
+},
   authenticate: async (_, args, ctx) => {
     const { serviceName, params } = args;
     const { injector, infos, collections } = ctx;
