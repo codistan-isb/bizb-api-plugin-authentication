@@ -1,5 +1,21 @@
 import password_1 from "@accounts/password";
 import server_1 from "@accounts/server";
+import { sendEmailOTP } from "../util/otp.js";
+
+const genericOtpFunc = async (createdUser, ctx) => {
+  let data;
+  // if (createdUser.type == "phoneNo" && createdUser?.username) {
+  //   console.log("here");
+  //   data = await generatePhoneOtp(ctx, createdUser.username, userId);
+  //   console.log("Phone otp response ", data);
+  // }
+ 
+    data = await sendEmailOTP(ctx, createdUser.emails[0].address, "temp");
+    console.log("Email is ", data);
+  
+
+  return data;
+};
 
 export default {
   createUser: async (_, { user }, ctx) => {
@@ -33,7 +49,9 @@ export default {
     //     });
     // }
     try {
+      user.isDeleted=false;
       userId = await accountsPassword.createUser(user);
+
     } catch (error) {
       // If ambiguousErrorMessages is true we obfuscate the email or username already exist error
       // to prevent user enumeration during user creation
@@ -54,6 +72,7 @@ export default {
       const account = {
         _id: userId,
         acceptsMarketing: false,
+        isDeleted: false,
         emails: [
           {
             address: user.email,
@@ -91,6 +110,10 @@ export default {
     // Explicitly saying this to Typescript compiler
     const loginResult = await accountsServer.loginWithUser(createdUser, infos);
     // console.log("loginResult ", loginResult);
+    console.log("loginResult ", createdUser);
+    let genericOtpResponse = await genericOtpFunc(createdUser, ctx);
+    console.log("genericOtpResponse ", genericOtpResponse);
+
     return {
       userId,
       loginResult,
