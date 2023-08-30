@@ -81,7 +81,7 @@ export default {
           },
         ],
         // groups: [groupId],
-        name: null,
+        name:  user.username,
         profile: {
           firstName: user.firstName,
           lastName: user.lastName,
@@ -93,6 +93,7 @@ export default {
         userId: userId,
         phoneNumber: user.phoneNumber,
       };
+      console.log("account ", account);
       const accountAdded = await Accounts.insertOne(account);
 
       // console.log("added account is ", accountAdded);
