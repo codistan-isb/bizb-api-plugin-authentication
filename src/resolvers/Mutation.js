@@ -1,6 +1,7 @@
 import password_1 from "@accounts/password";
 import server_1 from "@accounts/server";
 import { sendEmailOTP } from "../util/otp.js";
+import { ReactionError } from "@reactioncommerce/api-utils";
 
 const genericOtpFunc = async (createdUser, ctx) => {
   let data;
@@ -119,6 +120,84 @@ export default {
       userId,
       loginResult,
     };
+  },
+
+   verifyOTPSignUp: async (_, { user }, ctx)=>{
+    // const { serviceName, params } = args;
+    const { injector, infos, collections } = ctx;
+    const { users, Accounts } = collections;
+
+    //checking if account is deleted or not
+    const checkedAccount = await ctx.mutations.deleteAccount(ctx, {
+      userId: user.userId,
+    });
+
+    if (!user.userId) {
+      throw new ReactionError(
+        "invalid-parameter",
+        "Please provide userId to proceed."
+      );
+    }
+
+    try {
+      console.log("User Id is ", user);
+      const userObj = await users.findOne({ _id: user.userId });
+      console.log("User Id is ", userObj);
+
+      if (userObj) {
+        if (userObj.otp === user.otp) {
+          console.log("Same otp now check expiration date");
+
+          const expirationTime = new Date().getTime() + 15 * 60 * 1000;
+
+          // Check if the OTP is still valid
+          const isOtpValid = expirationTime > new Date().getTime();
+          console.log("isOtpValid ", isOtpValid);
+          // Use the value of isOtpValid to perform further actions, for example:
+          if (isOtpValid) {
+            console.log("OTP is still valid");
+            let updateOtp;
+            const options = { new: true };
+
+             if (userObj.type === "email") {
+              console.log("in email");
+              updateOtp = { $set: { "emails.0.verified": true } };
+            } else {
+              console.log("error in loginType");
+            }
+            const { result } = await users.updateOne(
+              { _id: userObj._id },
+              updateOtp,
+              options
+            );
+
+            const { result: accountResult } = await Accounts.updateOne(
+              { _id: userObj._id },
+              updateOtp,
+              options
+            );
+
+            console.log("Accounts Result is ", accountResult);
+
+            return result.n;
+          } else {
+            console.log("OTP has expired");
+            return false;
+            // Perform further actions for expired OTP
+          }
+        } else {
+          throw new ReactionError("not-found", "Otp is incorrect");
+        }
+      } else {
+        throw new ReactionError("not-found", "Could not found user");
+      }
+    } catch (err) {
+      console.log(err);
+      throw new ReactionError(
+        "server-error",
+        "Something went wrong.Please try again later."
+      );
+    }
   },
     refreshTokens: async (_, args, ctx) => {
     const { accessToken, refreshToken } = args;
