@@ -4,10 +4,12 @@ extend input CreateUserInput {
   firstName: String
   lastName: String
   phoneNumber: String
+  referralCode: String
 }
 extend type Account {
   legacyUsername: String
   firstName: String
   lastName: String
   phoneNumber: String
+  referralCode: String
 }

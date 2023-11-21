@@ -5,7 +5,7 @@ export default {
   createUser: async (_, { user }, ctx) => {
     const { injector, infos, collections } = ctx;
     const { Accounts, users, Groups } = collections;
-    // console.log("user", user);
+    console.log("user", user);
     const accountsServer = injector.get(server_1.AccountsServer);
     const accountsPassword = injector.get(password_1.AccountsPassword);
     let userId;
@@ -62,12 +62,13 @@ export default {
           },
         ],
         // groups: [groupId],
-        name: null,
+        name: user.firstName + " " + user.lastName,
+        referralCode: user.referralCode,
         profile: {
           firstName: user.firstName,
           lastName: user.lastName,
           dob: user.dob,
-          phone: user.username ? user.username : "",
+          phone: user.phoneNumber ? user.phoneNumber : "",
         },
         shopId: null,
         state: "new",
@@ -96,14 +97,14 @@ export default {
       loginResult,
     };
   },
-    refreshTokens: async (_, args, ctx) => {
+  refreshTokens: async (_, args, ctx) => {
     const { accessToken, refreshToken } = args;
     const { injector, infos } = ctx;
     const refreshedSession = await injector
-        .get(server_1.AccountsServer)
-        .refreshTokens(accessToken, refreshToken, infos);
+      .get(server_1.AccountsServer)
+      .refreshTokens(accessToken, refreshToken, infos);
     return refreshedSession;
-},
+  },
   authenticate: async (_, args, ctx) => {
     const { serviceName, params } = args;
     const { injector, infos, collections } = ctx;
@@ -147,22 +148,22 @@ export default {
     const { users } = collections;
 
     try {
-      
-      const TokenUser=await users.findOne({
+
+      const TokenUser = await users.findOne({
         "services.password.reset": {
           $elemMatch: {
             token: token
           },
-          
+
         },
-        
+
       });
       resetPasswordResponse = await injector
         .get(password_1.AccountsPassword)
         .resetPassword(token, newPassword, infos);
 
-      if(TokenUser&&TokenUser?.firstLogin){
-        await users.updateOne({_id:TokenUser?._id},{$set:{"firstLogin":false}});
+      if (TokenUser && TokenUser?.firstLogin) {
+        await users.updateOne({ _id: TokenUser?._id }, { $set: { "firstLogin": false } });
       }
       return resetPasswordResponse;
     }
