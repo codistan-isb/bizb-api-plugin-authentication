@@ -17,8 +17,10 @@ import Mutation from "./resolvers/Mutation.js";
 export default async function register(app) {
   const { accountsGraphQL, accountsServer } = await getAccounts(app);
 
+  console.log("AUTHENTICATION ");
+
   let ResolverObj = accountsGraphQL.resolvers;
-  ResolverObj["Mutation"] = Mutation
+  ResolverObj["Mutation"] = Mutation;
   ResolverObj["Account"] = Account;
   await app.registerPlugin({
     label: "Authentication-LoS",
@@ -26,24 +28,24 @@ export default async function register(app) {
     autoEnable: true,
     version: pkg.version,
     functionsByType: {
-      graphQLContext: [({ req }) => accountsGraphQL.context({ req })]
+      graphQLContext: [({ req }) => accountsGraphQL.context({ req })],
     },
     collections: {
       users: {
-        name: "users"
-      }
+        name: "users",
+      },
     },
     graphQL: {
       schemas: [mySchema],
       typeDefsObj: [accountsGraphQL.typeDefs],
-      resolvers: ResolverObj
+      resolvers: ResolverObj,
     },
     expressMiddleware: [
       {
         route: "graphql",
         stage: "authenticate",
-        fn: tokenMiddleware
-      }
-    ]
+        fn: tokenMiddleware,
+      },
+    ],
   });
 }
